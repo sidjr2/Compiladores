@@ -1,5 +1,4 @@
 package edu.ufsj.lox;
- // craftig
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +12,7 @@ class Scanner {
     
 	private final String source;
 	private final List<Token> tokens = new ArrayList<Token>();
+	
 	private int start = 0;
 	private int current = 0;
 	private int line = 1;
@@ -136,6 +136,11 @@ class Scanner {
 			case '\r':
 			case '\t':
 				break;
+			case 'o':
+				if (match('r')) {
+				  addToken(OR);
+				}
+				break;
 			case '\n':
 				line++;
 				break;
@@ -166,7 +171,9 @@ class Scanner {
 	}
 
 	private boolean isAlpha(final char c) {
-		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+		return (c >= 'a' && c <= 'z') || 
+			   (c >= 'A' && c <= 'Z') || 
+			   c == '_';
 	}
 
 	private boolean isAlphaNumeric(final char c) {
@@ -212,7 +219,8 @@ class Scanner {
     	while(isDigit(peek()))
                advance();
     }
-    addToken(NUMBER, Double.parseDouble(source.substring(start,current)));
+    addToken(NUMBER,
+		Double.parseDouble(source.substring(start,current)));
   }
 
   private char peekNext() {
