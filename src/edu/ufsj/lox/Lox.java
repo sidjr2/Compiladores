@@ -18,9 +18,8 @@ abstract class Expr{
     final Token operator;
     final Expr right;
   }
-}
 
-public class Lox {
+  public class Lox {
 	static boolean hadError = false;
 	public static void main(final String args[]) throws IOException {
         if (args.length > 1) {

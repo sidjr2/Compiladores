@@ -27,7 +27,10 @@ public class GenerateAst {
      * @param types
      * @throws IOException
      */
-    private static void defineAst(String outputDir, String baseName, List<String>types) throws IOException {
+    private static void defineAst(
+            String outputDir, String baseName, List<String>types)
+            throws IOException {
+                
         String path = outputDir+"/"+baseName+".java";
         try (
             PrintWriter writer = new PrintWriter(path, "UTF-8")) {
@@ -37,25 +40,62 @@ public class GenerateAst {
             writer.println();
             writer.println("abstract class"+baseName+"{");
 
+            defineVisitor(writer, baseName, types);
+
             for(String type:types){
                 String className = type.split(":")[0].trim();
                 String fields = type.split(":")[1].trim();
-                defineAst(writer, baseName, className, fields);
+                defineType(writer, baseName, className, fields);
             }
+
+            //method accept()
+            writer.println();
+            writer.println("\tabstract <R> R accept(Visitor<R> visitor);");
+            
             writer.println("}");
+
+
+            writer.println();
+            
             writer.close();
         }
     }
 
-    private static void defineAst(PrintWriter writer, String baseName, String className, String fieldsList) {
+    private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) {
+        writer.println("\tinterface Visitor<R> {");
+
+        for(String type:types){
+            String typeName = type.split(":")[0].trim();
+            writer.println("\t\tR visit"+typeName+baseName+"("+
+                typeName+" "+baseName.toLowerCase()+");");
+        }
+
+        writer.println("\t}");
+    }
+
+    private static void defineType(PrintWriter writer, String baseName, String className, String fieldsList) {
+        
         writer.println("\n\tstatic class"+className+"extends"+baseName+"}");
+        
+        //construtor
         writer.println("\t\t"+className+"("+fieldsList+"){");
+        
+        //Armazena paramentros
         String[] fields = fieldsList.split(",");
         for(String field:fields){
             String name = field.split("")[1];
             writer.println("\t\t\tthis."+name+"="+name+";");
         }
+       
         writer.println("\t\t}");
+
+        //Visitor
+        writer.println("\t\t@Override");
+        writer.println("\t\t<R> R accept(Visitor<R> visitor) {");
+        writer.println("\t\treturn visitor.visit"+className+baseName+ "(this);");
+        writer.println("\t\t}");
+       
+       //Fields
         writer.println();
 
         for(String field:fields){
@@ -63,4 +103,5 @@ public class GenerateAst {
         }
         writer.println("\t}");
     }
+      
 }
