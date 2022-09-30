@@ -6,6 +6,7 @@ import static edu.ufsj.lox.TokenType.*;
 
 class Parser {
 	
+	@SuppressWarnings("serial")
 	private static class ParseError extends RuntimeException {}
 	
 	private final List<Token> tokens;
