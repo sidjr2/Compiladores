@@ -9,22 +9,12 @@ import static edu.ufsj.lox.TokenType.*;
 
 
 class Scanner {
-    
-	private final String source;
-	private final List<Token> tokens = new ArrayList<Token>();
-	
-	private int start = 0;
-	private int current = 0;
-	private int line = 1;
-
-	Scanner(final String source) {
-		this.source = source;
-	}
 
 	private static final Map<String, TokenType> keywords;
-
+    
 	static {
 		keywords = new HashMap<String, TokenType>();
+		keywords.put("and", AND);
 		keywords.put("class", CLASS);
 		keywords.put("else", ELSE);
 		keywords.put("false", FALSE);
@@ -42,6 +32,17 @@ class Scanner {
 		keywords.put("while", WHILE);
 	}
 
+	private final String source;
+	private final List<Token> tokens = new ArrayList<Token>();
+
+	private int start = 0;
+	private int current = 0;
+	private int line = 1;
+
+	Scanner(final String source) {
+		this.source = source;
+	}
+	
 	List<Token> scanTokens() {
 
 		while (!isAtEnd()) { // add tokens ate chegar ao final da string
@@ -52,39 +53,6 @@ class Scanner {
 
 		tokens.add(new Token(EOF, "", null, line)); // construtor do token
 		return tokens;
-	}
-
-	private boolean isAtEnd() {
-		return current >= source.length();
-	}
-
-	private char advance() {
-		return source.charAt(current++);
-	}
-
-	private void addToken(final TokenType type) {
-		addToken(type, null);
-	}
-
-	private void addToken(final TokenType type, final Object literal) {
-		final String text = source.substring(start, current);
-		tokens.add(new Token(type, text, literal, line));
-	}
-
-	private boolean match(final char expected) {
-		if (isAtEnd())
-			return false;
-		if (source.charAt(current) != expected)
-			return false;
-
-		current++;
-		return true;
-	}
-
-	private char peek() {
-		if (isAtEnd())
-			return '\0';
-		return source.charAt(current);
 	}
 
 	private void scanToken() {
@@ -119,7 +87,7 @@ class Scanner {
 				break;
 			case '*':
 				addToken(STAR);
-				break;
+				break;  //slash
 			case '!':
 				addToken(match('=') ? BANG_EQUAL : BANG);
 				break;
@@ -170,6 +138,75 @@ class Scanner {
 		}
 	}
 
+	private void identifier() {
+		while (isAlphaNumeric(peek())){
+			advance();
+		}
+
+		String text = source.substring(start, current);
+		TokenType type = keywords.get(text);
+
+		if (type == null){
+			type = IDENTIFIER;
+		}
+		addToken(type);
+	}
+
+	private void number(){
+		while(isDigit(peek())){
+			advance();
+		}
+		if(peek() == '.' && isDigit(peekNext())){
+			advance();
+			while(isDigit(peek())){
+				advance();
+			}
+		}
+		addToken(NUMBER, Double.parseDouble(source.substring(start,current)));
+	}
+
+	private void string() {
+		while (peek() != '"' && !isAtEnd()) {
+			if (peek() == '\n'){
+				line++;
+			}
+			advance();
+		}
+
+		if (isAtEnd()) {
+			Lox.error(line, "unterminated string.");
+			return;
+		}
+
+		advance();
+
+		String value = source.substring(start + 1, current - 1);
+		addToken(STRING, value);
+	}
+
+	private boolean match(final char expected) {
+		if (isAtEnd())
+			return false;
+		if (source.charAt(current) != expected)
+			return false;
+
+		current++;
+		return true;
+	}
+
+	private char peek() {
+		if (isAtEnd())
+			return '\0';
+		return source.charAt(current);
+	}
+
+	private char peekNext() {
+		if(current +1 >= source.length()){
+			return '\0';
+		}
+		return source.charAt(current+1);
+	}
+
 	private boolean isAlpha(final char c) {
 		return (c >= 'a' && c <= 'z') || 
 			   (c >= 'A' && c <= 'Z') || 
@@ -180,52 +217,25 @@ class Scanner {
 		return isAlpha(c) || isDigit(c);
 	}
 
-	private void identifier() {
-		while (isAlphaNumeric(peek()))
-			advance();
-
-		final String text = source.substring(start, current);
-		TokenType type = keywords.get(text);
-
-		if (type == null)
-			type = IDENTIFIER;
-		addToken(type);
-	}
-
-	private void string() {
-		while (peek() != '"' && !isAtEnd()) {
-			if (peek() == '\n')
-				line++;
-			advance();
-		}
-		if (isAtEnd()) {
-			Lox.error(line, "unterminated string.");
-			return;
-		}
-		advance();
-		final String val = source.substring(start + 1, current - 1);
-		addToken(STRING, val);
-	}
-
 	private boolean isDigit(char c) {
 		return c >= '0' && c <= '9';
 	}
 
-  private void number(){
-    while(isDigit(peek())) 
-                  advance();
-    if(peek() == '.' && isDigit(peekNext())){
-    	advance();
-    	while(isDigit(peek()))
-               advance();
-    }
-    addToken(NUMBER,
-		Double.parseDouble(source.substring(start,current)));
-  }
+	private boolean isAtEnd() {
+		return current >= source.length();
+	}
 
-  private char peekNext() {
-    if(current +1 >= source.length())
-      return '\0';
-    return source.charAt(current+1);
-  }
+	private char advance() {
+		return source.charAt(current++);
+	}
+
+	private void addToken(final TokenType type) {
+		addToken(type, null);
+	}
+
+	private void addToken(final TokenType type, final Object literal) {
+		String text = source.substring(start, current);
+		tokens.add(new Token(type, text, literal, line));
+	}
+
 }
