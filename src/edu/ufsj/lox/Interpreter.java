@@ -33,6 +33,8 @@ class Interpreter implements Expr.Visitor<Object> {
 	    		return !isTruthy(right);
 	    	case MINUS:
 	    		return -(double)right;
+			default:
+				break;
 	    }
 
 	    return null;
@@ -96,9 +98,10 @@ class Interpreter implements Expr.Visitor<Object> {
 	    		if (left instanceof String && right instanceof String) {
 	    			return (String)left + (String)right;
 	    		}
-
-	    		break;
-	    	case SLASH:
+			
+			throw new RuntimeError(expr.operator, "Operands must be two number or two strings.");
+	    	
+			case SLASH:
 	    		checkNumberOperands(expr.operator, left, right);
 	    		return (double)left / (double)right;
 	    	case STAR:
@@ -108,6 +111,8 @@ class Interpreter implements Expr.Visitor<Object> {
 	    		return !isEqual(left, right);
 	        case EQUAL_EQUAL: 
 	        	return isEqual(left, right);
+			default:
+				break;
 	    }
 
 	    return null;
@@ -121,8 +126,10 @@ class Interpreter implements Expr.Visitor<Object> {
 		
 	}
 
-	private void checkNumberOperand(Token operator, Object operand) {
-		if (operand instanceof Double) return;
+	private void checkNumberOperand(Token operator, Object left, Object right) {
+		if (left instanceof Double && right instanceof Double){
+			return;
+		}
 	    throw new RuntimeError(operator, "Operand must be a number.");
 		
 	}
