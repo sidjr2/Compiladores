@@ -5,8 +5,11 @@ import java.util.List;
 abstract class Expr {
 	interface Visitor<R> {
 		R visitBinaryExpr(Binary expr);
+
 		R visitGroupingExpr(Grouping expr);
+
 		R visitLiteralExpr(Literal expr);
+
 		R visitUnaryExpr(Unary expr);
 	}
 
@@ -16,6 +19,7 @@ abstract class Expr {
 			this.operator = operator;
 			this.right = right;
 		}
+
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitBinaryExpr(this);
@@ -30,6 +34,7 @@ abstract class Expr {
 		Grouping(Expr expression) {
 			this.expression = expression;
 		}
+
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitGroupingExpr(this);
@@ -42,6 +47,7 @@ abstract class Expr {
 		Literal(Object value) {
 			this.value = value;
 		}
+
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitLiteralExpr(this);
@@ -55,6 +61,7 @@ abstract class Expr {
 			this.operator = operator;
 			this.right = right;
 		}
+
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitUnaryExpr(this);
@@ -66,4 +73,3 @@ abstract class Expr {
 
 	abstract <R> R accept(Visitor<R> visitor);
 }
-

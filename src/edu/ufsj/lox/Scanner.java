@@ -7,11 +7,10 @@ import java.util.HashMap;
 
 import static edu.ufsj.lox.TokenType.*;
 
-
 class Scanner {
 
 	private static final Map<String, TokenType> keywords;
-    
+
 	static {
 		keywords = new HashMap<String, TokenType>();
 		keywords.put("and", AND);
@@ -42,7 +41,7 @@ class Scanner {
 	Scanner(final String source) {
 		this.source = source;
 	}
-	
+
 	List<Token> scanTokens() {
 
 		while (!isAtEnd()) { // add tokens ate chegar ao final da string
@@ -58,116 +57,121 @@ class Scanner {
 	private void scanToken() {
 		final char c = advance();
 		switch (c) {
-			case '(':
-				addToken(LEFT_PAREN);
-				break;
-			case ')':
-				addToken(RIGHT_PAREN);
-				break;
-			case '{':
-				addToken(LEFT_BRACE);
-				break;
-			case '}':
-				addToken(RIGHT_BRACE);
-				break;
-			case ',':
-				addToken(COMMA);
-				break;
-			case '.':
-				addToken(DOT);
-				break;
-			case '-':
-				addToken(MINUS);
-				break;
-			case '+':
-				addToken(PLUS);
-				break;
-			case ';':
-				addToken(SEMICOLON);
-				break;
-			case '*':
-				addToken(STAR);
-				break;  //slash
-			case '!':
-				addToken(match('=') ? BANG_EQUAL : BANG);
-				break;
-			case '=':
-				addToken(match('=') ? EQUAL_EQUAL : EQUAL);
-				break;
-			case '<':
-				addToken(match('=') ? LESS_EQUAL : LESS);
-				break;
-			case '>':
-				addToken(match('=') ? GREATER_EQUAL : GREATER);
-				break;
-			case ' ':
-			case '\r':
-			case '\t':
-				break;
-			case 'o':
-				if (match('r')) {
-				  addToken(OR);
-				}
-				break;
-			case '\n':
-				line++;
-				break;
+		case '(':
+			addToken(LEFT_PAREN);
+			break;
+		case ')':
+			addToken(RIGHT_PAREN);
+			break;
+		case '{':
+			addToken(LEFT_BRACE);
+			break;
+		case '}':
+			addToken(RIGHT_BRACE);
+			break;
+		case ',':
+			addToken(COMMA);
+			break;
+		case '.':
+			addToken(DOT);
+			break;
+		case '-':
+			addToken(MINUS);
+			break;
+		case '+':
+			addToken(PLUS);
+			break;
+		case ';':
+			addToken(SEMICOLON);
+			break;
+		case '*':
+			addToken(STAR);
+			break; // slash
+		case '!':
+			addToken(match('=') ? BANG_EQUAL : BANG);
+			break;
+		case '=':
+			addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+			break;
+		case '<':
+			addToken(match('=') ? LESS_EQUAL : LESS);
+			break;
+		case '>':
+			addToken(match('=') ? GREATER_EQUAL : GREATER);
+			break;
+		case ' ':
+		case '\r':
+		case '\t':
+			break;
+		case 'o':
+			if (match('r')) {
+				addToken(OR);
+			}
+			break;
+		case '\n':
+			line++;
+			break;
 
-			case '/':
-				if (match('/')) {
-					while (peek() != '\n' && !isAtEnd())
-						advance();
-				} else {
-					addToken(SLASH);
-				}
-				break;
+		case '/':
+			if (match('/')) {
+				while (peek() != '\n' && !isAtEnd())
+					advance();
+			} else {
+				addToken(SLASH);
+			}
+			break;
 
-			case '"':
-				string();
-				break;
+		case '"':
+			string();
+			break;
+			
+		case '?':
+			//terminar o operador ternario baseado em c 
+			addToken(QUESTION);
+			break;
 
-			default:
-				if (isDigit(c)) {
-					number();
-				} else if (isAlpha(c)) {
-					identifier();
-				} else {
-					Lox.error(line, "unexpected character.");
-				}
-				break;
+		default:
+			if (isDigit(c)) {
+				number();
+			} else if (isAlpha(c)) {
+				identifier();
+			} else {
+				Lox.error(line, "unexpected character.");
+			}
+			break;
 		}
 	}
 
 	private void identifier() {
-		while (isAlphaNumeric(peek())){
+		while (isAlphaNumeric(peek())) {
 			advance();
 		}
 
 		String text = source.substring(start, current);
 		TokenType type = keywords.get(text);
 
-		if (type == null){
+		if (type == null) {
 			type = IDENTIFIER;
 		}
 		addToken(type);
 	}
 
-	private void number(){
-		while(isDigit(peek())){
+	private void number() {
+		while (isDigit(peek())) {
 			advance();
 		}
-		if(peek() == '.' && isDigit(peekNext())){
+		if (peek() == '.' && isDigit(peekNext())) {
 			advance();
-			while(isDigit(peek())){
+			while (isDigit(peek())) {
 				advance();
 			}
 		}
-		addToken(NUMBER, Double.parseDouble(source.substring(start,current)));
+		addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
 	}
 
 	private void string() {
 		while (peek() != '"' && !isAtEnd()) {
-			if (peek() == '\n'){
+			if (peek() == '\n') {
 				line++;
 			}
 			advance();
@@ -201,16 +205,14 @@ class Scanner {
 	}
 
 	private char peekNext() {
-		if(current +1 >= source.length()){
+		if (current + 1 >= source.length()) {
 			return '\0';
 		}
-		return source.charAt(current+1);
+		return source.charAt(current + 1);
 	}
 
 	private boolean isAlpha(final char c) {
-		return (c >= 'a' && c <= 'z') || 
-			   (c >= 'A' && c <= 'Z') || 
-			   c == '_';
+		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 	}
 
 	private boolean isAlphaNumeric(final char c) {

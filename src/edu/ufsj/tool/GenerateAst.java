@@ -5,157 +5,137 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class GenerateAst {
-    public static void main(String[] args) throws IOException {
-        if(args.length !=1){
-            System.err.println("Usage: java edu.ufsj.tool.GenerateAst <output dir>");
-            System.exit(64);
-        }
-        
-        String outputDir = args[0];
-        
-        defineAst(outputDir, "Expr",Arrays.asList(
-            "Assign   : Token name, Expr value",
-            "Binary   : Expr left, Token operator, Expr right",
-            "Call     : Expr callee, Token paren, List<Expr> arguments",
-            "Get      : Expr object, Token name",
-            "Grouping : Expr expression",
-            "Literal  : Object value",
-            "Logical  : Expr left, Token operator, Expr right",
-            "Super    : Token keyword, Token method",
-            "This     : Token keyword",
-            "Unary    : Token operator, Expr right",
-            "Variable : Token name"
-        ));
-        
-        defineAst(outputDir, "Stmt", Arrays.asList(
-            "Block      : List<Stmt> statements",
-            "Class      : Token name, List<Stmt.Function> methods",
-            "Class      : Token name, Expr.Variable superclass," +
-                        " List<Stmt.Function> methods",
-            "Expression : Expr expression",
-            "Function   : Token name, List<Token> params," +
-                        " List<Stmt> body",
-            "If         : Expr condition, Stmt thenBranch," +
-                        " Stmt elseBranch",
-            "Print      : Expr expression",
-            "Print      : Expr expression",
-            "Return     : Token keyword, Expr value",
-            "Var        : Token name, Expr initializer",
-            "While      : Expr condition, Stmt body"
-        ));
-    }
-    
-    private static void defineAst(
-        String outputDir, String baseName, List<String> types)
-        throws IOException {
-    	
-        String path = outputDir + "/" + baseName + ".java";
-        PrintWriter writer = new PrintWriter(path, "UTF-8");
-        
-        //writer.println("//> Appendix II " + baseName.toLowerCase());
-        
-        writer.println("package edu.ufsj.lox;");
-        writer.println();
-        writer.println("import java.util.List;");
-        writer.println();
-        writer.println("abstract class "+ baseName +" {");
+	public static void main(String[] args) throws IOException {
+		if (args.length != 1) {
+			System.err.println("Usage: java edu.ufsj.tool.GenerateAst <output dir>");
+			System.exit(64);
+		}
 
-        defineVisitor(writer, baseName, types);
+		String outputDir = args[0];
 
-        /*
-        *writer.println();
-        *writer.println("\t// Nested "+ baseName + "\tclasses here...");
-         */
-        
-        
-        //AST CLASS
-        for(String type:types){
-            String className = type.split(":")[0].trim();
-            String fields = type.split(":")[1].trim(); 
-            defineType(writer, baseName, className, fields);
-        }
-        
-        //method accept()
-        writer.println();
-        writer.println("\tabstract <R> R accept(Visitor<R> visitor);");
-            
-        writer.println("}");
+		defineAst(outputDir, "Expr",
+				Arrays.asList("Assign   : Token name, Expr value", "Binary   : Expr left, Token operator, Expr right",
+						"Call     : Expr callee, Token paren, List<Expr> arguments",
+						"Get      : Expr object, Token name", "Grouping : Expr expression", "Literal  : Object value",
+						"Logical  : Expr left, Token operator, Expr right", "Super    : Token keyword, Token method",
+						"This     : Token keyword", "Unary    : Token operator, Expr right", "Variable : Token name"));
 
-        //writer.println("//< Appendix II " + baseName.toLowerCase());
+		defineAst(outputDir, "Stmt", Arrays.asList("Block      : List<Stmt> statements",
+				"Class      : Token name, List<Stmt.Function> methods",
+				"Class      : Token name, Expr.Variable superclass," + " List<Stmt.Function> methods",
+				"Expression : Expr expression", "Function   : Token name, List<Token> params," + " List<Stmt> body",
+				"If         : Expr condition, Stmt thenBranch," + " Stmt elseBranch", "Print      : Expr expression",
+				"Print      : Expr expression", "Return     : Token keyword, Expr value",
+				"Var        : Token name, Expr initializer", "While      : Expr condition, Stmt body"));
+	}
 
-        writer.println();
-            
-        writer.close();
-    }
-    private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) {
-        
-        writer.println("\tinterface Visitor<R> {");
+	private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {
 
-        for(String type:types){
-            
-            String typeName = type.split(":")[0].trim();
-            
-            writer.println("\t\tR visit"+ typeName + baseName + "(" +
-                            typeName + " " + baseName.toLowerCase()+ ");" );
-        }
+		String path = outputDir + "/" + baseName + ".java";
+		PrintWriter writer = new PrintWriter(path, "UTF-8");
 
-        writer.println("\t}");
-    }
+		// writer.println("//> Appendix II " + baseName.toLowerCase());
 
-    /**
-     * @param writer
-     * @param baseName
-     * @param className
-     * @param fieldsList
-     */
-    private static void defineType(PrintWriter writer, String baseName, String className, String fieldsList) {
-        
-        /*
-        *writer.println("//> " +
-        *baseName.toLowerCase() + "-" + className.toLowerCase());
-        */
+		writer.println("package edu.ufsj.lox;");
+		writer.println();
+		writer.println("import java.util.List;");
+		writer.println();
+		writer.println("abstract class " + baseName + " {");
 
-        writer.println("\n\tstatic class "+ className +" extends "+ baseName +" {");
-        
-        /*
-        * if (fieldList.length() > 64) {
-        * fieldList = fieldList.replace(", ", ",\n          ");
-        *}
-         */
+		defineVisitor(writer, baseName, types);
 
-        //construtor
-        writer.println("\t\t"+ className +"("+ fieldsList + ") {");
+		/*
+		 * writer.println(); writer.println("\t// Nested "+ baseName +
+		 * "\tclasses here...");
+		 */
 
-        /* fieldList = fieldList.replace(",\n          ", ", "); */
-        
-        //Armazena paramentros
-        String[] fields = fieldsList.split(", ");
-        for(String field:fields){
-            String name = field.split(" ")[1];
-            writer.println("\t\t\tthis."+ name +" = "+ name +";");
-        }
-       
-        writer.println("\t\t}");
+		// AST CLASS
+		for (String type : types) {
+			String className = type.split(":")[0].trim();
+			String fields = type.split(":")[1].trim();
+			defineType(writer, baseName, className, fields);
+		}
 
-        //Visitor
-        writer.println("\t\t@Override");
-        writer.println("\t\t<R> R accept(Visitor<R> visitor) {");
-        writer.println("\t\t\treturn visitor.visit"+ className + baseName + "(this);");
-        writer.println("\t\t}");
-       
-       //Fields
-        writer.println();
+		// method accept()
+		writer.println();
+		writer.println("\tabstract <R> R accept(Visitor<R> visitor);");
 
-        for(String field:fields){
-            writer.println("\t\tfinal "+ field+ ";");
-        }
-        writer.println("\t}");
+		writer.println("}");
 
-        /* writer.println("//< " +
-        *baseName.toLowerCase() + "-" + className.toLowerCase()); 
-        */
+		// writer.println("//< Appendix II " + baseName.toLowerCase());
 
-    }
+		writer.println();
+
+		writer.close();
+	}
+
+	private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) {
+
+		writer.println("\tinterface Visitor<R> {");
+
+		for (String type : types) {
+
+			String typeName = type.split(":")[0].trim();
+
+			writer.println("\t\tR visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
+		}
+
+		writer.println("\t}");
+	}
+
+	/**
+	 * @param writer
+	 * @param baseName
+	 * @param className
+	 * @param fieldsList
+	 */
+	private static void defineType(PrintWriter writer, String baseName, String className, String fieldsList) {
+
+		/*
+		 * writer.println("//> " + baseName.toLowerCase() + "-" +
+		 * className.toLowerCase());
+		 */
+
+		writer.println("\n\tstatic class " + className + " extends " + baseName + " {");
+
+		/*
+		 * if (fieldList.length() > 64) { fieldList = fieldList.replace(", ",
+		 * ",\n          "); }
+		 */
+
+		// construtor
+		writer.println("\t\t" + className + "(" + fieldsList + ") {");
+
+		/* fieldList = fieldList.replace(",\n          ", ", "); */
+
+		// Armazena paramentros
+		String[] fields = fieldsList.split(", ");
+		for (String field : fields) {
+			String name = field.split(" ")[1];
+			writer.println("\t\t\tthis." + name + " = " + name + ";");
+		}
+
+		writer.println("\t\t}");
+
+		// Visitor
+		writer.println("\t\t@Override");
+		writer.println("\t\t<R> R accept(Visitor<R> visitor) {");
+		writer.println("\t\t\treturn visitor.visit" + className + baseName + "(this);");
+		writer.println("\t\t}");
+
+		// Fields
+		writer.println();
+
+		for (String field : fields) {
+			writer.println("\t\tfinal " + field + ";");
+		}
+		writer.println("\t}");
+
+		/*
+		 * writer.println("//< " + baseName.toLowerCase() + "-" +
+		 * className.toLowerCase());
+		 */
+
+	}
 }
