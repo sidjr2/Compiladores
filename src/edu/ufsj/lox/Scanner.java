@@ -29,6 +29,8 @@ class Scanner {
 		keywords.put("true", TRUE);
 		keywords.put("var", VAR);
 		keywords.put("while", WHILE);
+		keywords.put("question",QUESTION);
+	
 	}
 
 	private final String source;
@@ -90,6 +92,10 @@ class Scanner {
 		case '!':
 			addToken(match('=') ? BANG_EQUAL : BANG);
 			break;
+		case '?':
+			addToken(match(':'))
+			break;
+
 		case '=':
 			addToken(match('=') ? EQUAL_EQUAL : EQUAL);
 			break;
