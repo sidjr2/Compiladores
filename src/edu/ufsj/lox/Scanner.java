@@ -92,10 +92,6 @@ class Scanner {
 		case '!':
 			addToken(match('=') ? BANG_EQUAL : BANG);
 			break;
-		case '?':
-			addToken(match(':'))
-			break;
-
 		case '=':
 			addToken(match('=') ? EQUAL_EQUAL : EQUAL);
 			break;
@@ -132,10 +128,11 @@ class Scanner {
 			break;
 			
 		case '?':
-			//terminar o operador ternario baseado em c 
 			addToken(QUESTION);
 			break;
-
+		case ':':
+			addToken(COLON);
+			break;
 		default:
 			if (isDigit(c)) {
 				number();

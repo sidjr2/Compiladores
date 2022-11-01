@@ -76,6 +76,18 @@ class Interpreter implements Expr.Visitor<Object> {
 	}
 
 	@Override
+	public Object visitTernaryExpr(Expr.Ternary expr){
+		Object left = evaluate(expr.left);
+		Object meio = evaluate(expr.meio);
+		Object rigth = evaluate(expr.right);
+
+		if(expr.operator1.type == TokenType.QUESTION){
+			
+		}
+		return null;
+	}
+
+	@Override
 	public Object visitBinaryExpr(Expr.Binary expr) {
 		Object left = evaluate(expr.left);
 		Object right = evaluate(expr.right);

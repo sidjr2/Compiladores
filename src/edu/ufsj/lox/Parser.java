@@ -26,9 +26,22 @@ class Parser {
 	}
 
 	private Expr expression() {
-		return equality();
+		return ternary();
 	}
 
+	private Expr ternary(){
+		Expr expr = equality();
+		
+		if(match(QUESTION)){
+			Token operator1 = previous();
+			Expr meio = equality();
+			Token operator2 = consume(COLON, "Expect ':' is ternary operator.");
+			Expr right = equality();
+			expr = new Expr.Ternary(expr, operator1,meio, operator2, right);
+		}
+		return expr;
+		
+	}
 	private Expr equality() {
 		Expr expr = comparison();
 

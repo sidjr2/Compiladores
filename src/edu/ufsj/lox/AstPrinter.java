@@ -9,6 +9,11 @@ class AstPrinter implements Expr.Visitor<String> {
 	public String visitBinaryExpr(Expr.Binary expr) {
 		return parenthesize(expr.operator.lexeme, expr.left, expr.right);
 	}
+	@Override
+	public String visitTernaryExpr(Expr.Ternary expr){
+		return parenthesize(expr.operator1.lexeme + expr.operator2.lexeme,
+							expr.left, expr.meio, expr.right);
+	}
 
 	@Override
 	public String visitGroupingExpr(Expr.Grouping expr) {
@@ -70,6 +75,10 @@ class AstPrinter implements Expr.Visitor<String> {
 		Expr expression = new Expr.Binary(
 				new Expr.Unary(new Token(TokenType.MINUS, "-", null, 1), new Expr.Literal(123)),
 				new Token(TokenType.STAR, "*", null, 1), new Expr.Grouping(new Expr.Literal(45.67)));
+
+		//final Expr expression = new Expr.Ternary(
+				//new expression, null, expression, null, expression);*/
+		
 
 		System.out.println(new AstPrinter().print(expression));
 	}
