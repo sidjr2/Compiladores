@@ -29,7 +29,6 @@ class Scanner {
 		keywords.put("true", TRUE);
 		keywords.put("var", VAR);
 		keywords.put("while", WHILE);
-		keywords.put("question",QUESTION);
 	
 	}
 
@@ -115,6 +114,7 @@ class Scanner {
 			break;
 
 		case '/':
+			/*comentario de duas linha */
 			if (match('/')) {
 				while (peek() != '\n' && !isAtEnd())
 					advance();
@@ -127,12 +127,6 @@ class Scanner {
 			string();
 			break;
 			
-		case '?':
-			addToken(QUESTION);
-			break;
-		case ':':
-			addToken(COLON);
-			break;
 		default:
 			if (isDigit(c)) {
 				number();
