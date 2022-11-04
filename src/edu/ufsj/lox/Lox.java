@@ -48,8 +48,7 @@ public class Lox {
 		Scanner scanner = new Scanner(source);
 		List<Token> tokens = scanner.scanTokens();
 
-		for(Token token : tokvar language = "lox";
-ens){
+		for(Token token : tokens){
 			System.out.println(token);
 		}
 	}
