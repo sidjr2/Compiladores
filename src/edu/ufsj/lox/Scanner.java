@@ -10,6 +10,13 @@ import static edu.ufsj.lox.TokenType.*;
 class Scanner {
 
 	private static final Map<String, TokenType> keywords;
+	private final String source;
+	private final List<Token> tokens = new ArrayList<Token>();
+
+	private int start = 0;
+	private int current = 0;
+	private int line = 1;
+
 
 	static {
 		keywords = new HashMap<String, TokenType>();
@@ -33,12 +40,6 @@ class Scanner {
 	
 	}
 
-	private final String source;
-	private final List<Token> tokens = new ArrayList<Token>();
-
-	private int start = 0;
-	private int current = 0;
-	private int line = 1;
 
 	Scanner(final String source) {
 		this.source = source;
@@ -113,7 +114,6 @@ class Scanner {
 		case '\n':
 			line++;
 			break;
-
 		case '/':
 			if (match('/')) {
 				while (peek() != '\n' && !isAtEnd())
@@ -122,7 +122,7 @@ class Scanner {
 				addToken(SLASH);
 			}
 			break;
-
+		
 		case '"':
 			string();
 			break;
@@ -207,7 +207,7 @@ class Scanner {
 		return source.charAt(current);
 	}
 
-	private char peekNext() {
+ 	private char peekNext() {
 		if (current + 1 >= source.length()) {
 			return '\0';
 		}

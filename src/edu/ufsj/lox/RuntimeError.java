@@ -1,6 +1,5 @@
 package edu.ufsj.lox;
 
-@SuppressWarnings("serial")
 class RuntimeError extends RuntimeException {
 
 	final Token token;
