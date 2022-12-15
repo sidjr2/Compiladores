@@ -73,7 +73,7 @@ public class Interpreter implements Expr.Visitor<Object>{
 	}
 	
 	@Override
-	public Object visitBinaryExpr(Expr.Binary expr) {
+	public Object visitBinaryExpr(Expr.Binary expr) {   
 		Object left = evaluate(expr.left);
 		Object right = evaluate(expr.right);
 		
@@ -85,6 +85,7 @@ public class Interpreter implements Expr.Visitor<Object>{
 			if(left instanceof String && right instanceof String) {
 				return (String)left + (String)right;
 			}
+			//tp2
 			if (left instanceof String && right instanceof Double) {
 				return (String)left + stringify(right);
 			}

@@ -56,11 +56,11 @@ public class AstPrinter implements Expr.Visitor<String>{
 				new Token(TokenType.STAR, "*", null, 1), new Expr.Grouping(new Expr.Literal(45.67)));*/
 
 				Expr expression = new Expr.Ternary(
-					new Expr.Literal("expressao"),
+					new Expr.Literal("expr"),
 					new Token(TokenType.QUESTION, "? ", null, 1),
-					new Expr.Literal("func1"),
+					new Expr.Literal("parte1"),
 					new Token(TokenType.COLON, " :", null, 1),
-					new Expr.Literal("func2"));
+					new Expr.Literal("parte2"));
 		
 
 		System.out.println(new AstPrinter().print(expression));
