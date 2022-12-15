@@ -1,5 +1,7 @@
+"mate"+9 
 5 < 3 ? 2 : 6
 /*acho que ta funcionando 
 mas sera que ta mesmo??
 */
 6 > 7 ? 1: 0
+9+"mate"
